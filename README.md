@@ -1,6 +1,6 @@
-# Neural Network from First Principles (NumPy only)
+# AI Image Classifier: a Neural Network Built from Scratch
 
-A multi-layer perceptron written from scratch with **only NumPy**: no PyTorch, TensorFlow or scikit-learn. Every part is implemented by hand: the forward pass, activation functions and their derivatives, loss functions, backpropagation, and the SGD-with-momentum and Adam optimizers. Every gradient is **verified numerically** against finite differences.
+An AI that recognises handwritten digits, built from first principles with **only NumPy**: no PyTorch, TensorFlow or scikit-learn. Every part is implemented by hand: the forward pass, activation functions and their derivatives, loss functions, backpropagation, and the SGD-with-momentum and Adam optimizers. Every gradient is **verified numerically** against finite differences.
 
 On MNIST handwritten digits, a `[784, 128, 64, 10]` network reaches **97.6% test accuracy** with Adam in 10 epochs (about 2–4 s per epoch on a laptop CPU).
 
@@ -11,6 +11,24 @@ On MNIST handwritten digits, a `[784, 128, 64, 10]` network reaches **97.6% test
 | Test accuracy (SGD + momentum, 10 epochs) | 97.59% |
 | Largest gradient-check error | 1.3e-8 (relative) |
 | Speed-up of NumPy over nested Python loops | about 270× |
+
+---
+
+## How it works
+
+**1. An image becomes numbers.** Each picture is a 28×28 grid of pixels. Every pixel is a brightness value, so one image is a list of 784 numbers.
+
+**2. The numbers flow through layers of "neurons".** Each neuron multiplies its inputs by its own set of **weights**, adds them up, and passes the result on. Neurons are grouped into layers: 784 inputs → 128 neurons → 64 neurons → 10 outputs. Altogether, the network has 109,386 adjustable weights.
+
+**3. The network makes a guess.** The 10 outputs are turned into probabilities, one for each digit 0–9, such as "92% sure it's a 7". The highest one is the answer.
+
+**4. It measures how wrong it was.** The guess is compared with the correct label, giving one number called the **loss**. A confident correct answer gives a loss near 0. A confident wrong answer gives a large loss.
+
+**5. It works out how to improve.** Using the chain rule from calculus, **backpropagation** works backwards through the network and calculates, for every one of the 109,386 weights, whether nudging it up or down would reduce the loss, and by how much.
+
+**6. It adjusts and repeats.** An **optimizer** nudges every weight a small step in the helpful direction. Repeating this over 60,000 training images, several times over, gradually turns random weights into a network that recognises digits it has never seen before, with 97.6% accuracy.
+
+The sections below go through the maths behind each step.
 
 ---
 
@@ -61,7 +79,7 @@ Parameter count: $(128 \cdot 784 + 128) + (64 \cdot 128 + 64) + (10 \cdot 64 + 1
 ## 2. Forward propagation
 
 ```math
-Z^{[l]} = W^{[l]} A^{[l-1]} + b^{[l]}, \qquad A^{[l]} = g^{[l]}\!\left(Z^{[l]}\right)
+Z^{[l]} = W^{[l]} A^{[l-1]} + b^{[l]}, \qquad A^{[l]} = g^{[l]}\left(Z^{[l]}\right)
 ```
 
 Shapes: $(n_l, n_{l-1}) \cdot (n_{l-1}, m) \to (n_l, m)$. Hidden layers use ReLU; the output layer uses softmax.
@@ -74,7 +92,7 @@ Shapes: $(n_l, n_{l-1}) \cdot (n_{l-1}, m) \to (n_l, m)$. Hidden layers use ReLU
 | Sigmoid | $\sigma(z) = \dfrac{1}{1 + e^{-z}}$ | $\sigma(z)\,\big(1 - \sigma(z)\big)$ |
 | Softmax | $a_i = \dfrac{e^{z_i}}{\sum_j e^{z_j}}$ | $\dfrac{\partial a_i}{\partial z_k} = a_i(\delta_{ik} - a_k)$ |
 
-Softmax mixes a whole column, so its derivative is a Jacobian matrix $J = \operatorname{diag}(a) - a a^{\top}$. Its product with an upstream gradient simplifies without ever building $J$:
+Softmax mixes a whole column, so its derivative is a Jacobian matrix $J = \text{diag}(a) - a a^{\top}$. Its product with an upstream gradient simplifies without ever building $J$:
 
 ```math
 J\,\frac{\partial L}{\partial a} = a \odot \left(\frac{\partial L}{\partial a} - \Big(a^{\top} \frac{\partial L}{\partial a}\Big)\mathbf{1}\right)
@@ -124,7 +142,7 @@ Writing $dX$ for $\partial L / \partial X$, and starting from $dA^{[L]} = \parti
 
 ```math
 \begin{aligned}
-dZ^{[l]} &= dA^{[l]} \odot g'^{[l]}\!\left(Z^{[l]}\right) && (n_l, m) \\
+dZ^{[l]} &= dA^{[l]} \odot g'^{[l]}\left(Z^{[l]}\right) && (n_l, m) \\
 dW^{[l]} &= dZ^{[l]} \, A^{[l-1]\top} && (n_l, m)\cdot(m, n_{l-1}) \to (n_l, n_{l-1}) \\
 db^{[l]} &= \textstyle\sum_{j=1}^{m} dZ^{[l]}_{:,j} && (n_l, 1) \\
 dA^{[l-1]} &= W^{[l]\top} \, dZ^{[l]} && (n_{l-1}, n_l)\cdot(n_l, m) \to (n_{l-1}, m)
@@ -135,7 +153,7 @@ Every gradient has the same shape as the quantity it differentiates, which is a 
 
 ### Softmax + cross-entropy simplifies
 
-For one example, with $a = \operatorname{softmax}(z)$ and one-hot $y$ (so $\sum_k y_k = 1$):
+For one example, with $a = \text{softmax}(z)$ and one-hot $y$ (so $\sum_k y_k = 1$):
 
 ```math
 \frac{\partial L}{\partial z_i}
