@@ -1,8 +1,8 @@
 # AI Image Classifier: Neural Network 
 
-An AI that recognises handwritten digits, built from first principles with **only NumPy**: no PyTorch, TensorFlow or scikit-learn. Every part is implemented by hand: the forward pass, activation functions and their derivatives, loss functions, backpropagation, and the SGD-with-momentum and Adam optimizers. Every gradient is **verified numerically** against finite differences.
+An AI that learns to recognise images, built entirely from scratch in Python. Instead of relying on a ready-made machine learning library, every part of the neural network is written by hand, from how it makes predictions to how it learns from its mistakes.
 
-On MNIST handwritten digits, a `[784, 128, 64, 10]` network reaches **97.6% test accuracy** with Adam in 10 epochs (about 2–4 s per epoch on a laptop CPU).
+Trained on a dataset of handwritten digits, it correctly identifies **97.6%** of images it has never seen before.
 
 | | |
 |---|---|
