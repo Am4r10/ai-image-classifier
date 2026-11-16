@@ -1,4 +1,4 @@
-# AI Image Classifier: a Neural Network Built from Scratch
+# AI Image Classifier: Neural Network 
 
 An AI that recognises handwritten digits, built from first principles with **only NumPy**: no PyTorch, TensorFlow or scikit-learn. Every part is implemented by hand: the forward pass, activation functions and their derivatives, loss functions, backpropagation, and the SGD-with-momentum and Adam optimizers. Every gradient is **verified numerically** against finite differences.
 
