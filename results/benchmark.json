@@ -1,0 +1,12 @@
+{
+  "samples": 256,
+  "batch_size": 64,
+  "loop_seconds_subset": 2.2096074000000954,
+  "numpy_seconds_subset": 0.005474700001286692,
+  "loop_ms_per_image": 8.631278906250373,
+  "numpy_ms_per_image": 0.02138554688002614,
+  "loop_full_epoch_seconds_estimated": 517.8767343750224,
+  "numpy_full_epoch_seconds_measured": 1.9337195000007341,
+  "speedup": 267.8137829063759,
+  "max_weight_difference": 5.551115123125783e-17
+}
